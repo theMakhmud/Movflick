@@ -74,7 +74,7 @@ const App = () => {
       {/* <Genre selectedGenre={selectedGenre} setSelectedGenre={setSelectedGenre} genreList={genreList} /> */}
        { !searchTerm.trim() && <Genre movieList={movieList} genreList={genreList} selectedGenre={selectedGenre} setSelectedGenre={setSelectedGenre} /> }
 
-      <main className='px-4 py-1 flex flex-col gap-3'>
+      <main className='px-4 py-1 mb-18 flex flex-col gap-3'>
         {isLoading ? (
           <Loading />
         ) : errorMessage ? (

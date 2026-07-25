@@ -10,16 +10,16 @@ const Genre = ({movieList, genreList,selectedGenre, setSelectedGenre}) => {
   return (
     
     <div className='px-4 py-4  overflow-x-auto scrollbar-hide'>
-        <ul className='flex gap-3 items-center text-sm font-semibold'>
+        <ul className='flex gap-3 items-center text-[#9E9E9E] text-sm font-semibold'>
             <li
-            onClick={() => setSelectedGenre(null)} className={`px-4 py-2 cursor-pointer rounded-3xl whitespace-nowrap ${
-            selectedGenre === null ? 'bg-primary' : 'bg-card'
+            onClick={() => setSelectedGenre(null)} className={`px-4 py-2 cursor-pointer hover:text-white rounded-3xl whitespace-nowrap ${
+            selectedGenre === null ? 'bg-primary text-white'  : 'bg-card'
             }`}>All</li>
             {genreFilter.map(genre => (
                 <li key={genre.id}
                     onClick={() => setSelectedGenre(genre.id)} 
-                    className={`px-4 py-2 cursor-pointer rounded-3xl whitespace-nowrap ${
-                    selectedGenre === genre.id ? 'bg-primary' : 'bg-card'
+                    className={`px-4 py-2 cursor-pointer rounded-3xl whitespace-nowrap hover:text-white ${
+                    selectedGenre === genre.id ? 'bg-primary text-white' : 'bg-card'
             }  `}>{genre.name}</li>
             ))}
         </ul>

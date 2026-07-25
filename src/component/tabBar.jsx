@@ -56,7 +56,7 @@ const TabBar = () => {
         },
     ]
     return (
-        <div className='fixed w-full bottom-0 flex justify-between bg-tabbar px-2 py-1'>
+        <div className='fixed z-50 w-full bottom-0 flex justify-between bg-tabbar px-2 py-1'>
 
             {buttons.map((btn) => {
                 const isActive = btn.path === '/'
