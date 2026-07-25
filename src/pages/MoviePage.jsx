@@ -98,11 +98,11 @@ const MoviePage = () => {
 
   const handleBack = () => {
   if (window.history.length > 2) {
-    navigate(-1)
-  } else {
-    navigate('/')
+      navigate(-1)
+    } else {
+      navigate('/')
+    }
   }
-}
 
   return (
     <div className='w-full flex flex-col mb-10'>
