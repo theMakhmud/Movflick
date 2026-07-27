@@ -64,7 +64,6 @@ const App = () => {
 
   useEffect( () => {
     fetchAll(searchTerm)
-    console.log(movieList)
   }, [searchTerm])
 
   return (

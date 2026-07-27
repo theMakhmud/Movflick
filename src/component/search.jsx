@@ -1,7 +1,6 @@
 import React from 'react'
 
 const Search = ({value, setValue}) => {
-  console.log(value)
   return (
     <div className='px-4'>
         <div className="flex items-center px-3  gap-2 bg-card py-3 rounded-xl ">
