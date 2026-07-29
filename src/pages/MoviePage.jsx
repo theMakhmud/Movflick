@@ -5,6 +5,7 @@ import star from '../assets/Movflick-selection.png'
 import playIcon from '../assets/Movflick-logo.png'
 import { useNavigate } from 'react-router-dom'
 import { useFavorites } from '../Context'
+import TrailerPlayer from '../component/Tariler'
 
 const API_BASE_TMDB = "https://api.themoviedb.org/3"
 const API_KEY = import.meta.env.VITE_TMDB_API
@@ -28,6 +29,10 @@ const MoviePage = () => {
   const [genre, setGenre] = useState([])
   const [similar, setSimilar] = useState([])
 
+  const [trailerKey, setTrailerKey] = useState(null)
+  const [showTrailer, setShowTrailer] = useState(false)
+  const [playTrailer, setPlayTrailer] = useState(false)
+
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -47,15 +52,23 @@ const MoviePage = () => {
           movieId = popData.results[1].id
         }
 
-        const [detailsRes, similarRes, genreRes] = await Promise.all([
+        const [detailsRes, similarRes, genreRes, videoRes] = await Promise.all([
           fetch(`${API_BASE_TMDB}/movie/${movieId}`, API_OPTION),
           fetch(`${API_BASE_TMDB}/movie/${movieId}/similar`, API_OPTION),
-          fetch(`${API_BASE_TMDB}/genre/movie/list`, API_OPTION)
+          fetch(`${API_BASE_TMDB}/genre/movie/list`, API_OPTION),
+          fetch(`${API_BASE_TMDB}/movie/${movieId}/videos`, API_OPTION)
         ])
 
         const detailsData = await detailsRes.json()
         const similarData = await similarRes.json()
         const genreData = await genreRes.json()
+        const videosData = await videoRes.json()
+
+        const trailer = videosData.results.find(
+          v => v.site === 'YouTube' && v.type === 'Trailer'
+        )
+
+        setTrailerKey(trailer?.key || null)
 
         setMovie(detailsData)
         setSimilar(similarData.results)
@@ -165,11 +178,16 @@ const MoviePage = () => {
         </div>
 
         <div className='flex items-center gap-3 mt-1'>
-          <button className='flex-1 h-12 bg-primary-hover rounded-full flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98] transition-transform'>
+          <button
+          onClick={() => setShowTrailer(true)}
+          disabled={!trailerKey}
+          className='flex-1 h-12 bg-primary-hover rounded-full flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98] transition-transform disabled:opacity-50'>
             <svg className='w-6 h-6 text-black bg-black' viewBox="0 0 24 24" fill="">
               <path d="M8 5v14l11-7z" />
             </svg>
-            <span className='text-black font-bold text-base'>Watch Trailer</span>
+            <span className='text-black font-bold text-base'>
+              {trailerKey ? 'Watch Trailer' : 'No Trailer'}
+            </span>
           </button>
 
           <button className='w-12 h-12 shrink-0 rounded-full border border-white/20 flex items-center justify-center cursor-pointer active:scale-95 transition-transform'>
@@ -262,7 +280,77 @@ const MoviePage = () => {
 
       </div>
 
+      {showTrailer && trailerKey && (
+        <div
+          className='fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/85 backdrop-blur-md animate-[fadeIn_0.2s_ease-out]'
+          onClick={() => { setShowTrailer(false); setPlayTrailer(false) }}
+        >
+          <div
+            className='relative w-full max-w-4xl'
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className='flex items-center justify-between mb-3'>
+              <div className='flex items-center gap-2'>
+                <span className='w-1 h-5 bg-primary rounded-full' />
+                <h3 className='text-white font-bold text-lg line-clamp-1'>{movie.title}</h3>
+              </div>
+              <button
+                onClick={() => { setShowTrailer(false); setPlayTrailer(false) }}
+                className='w-9 h-9 shrink-0 flex items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors cursor-pointer'
+              >
+                <svg className='w-5 h-5' viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    strokeWidth="2" strokeLinecap="round">
+                  <path d="M18 6 6 18M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
 
+            {playTrailer ? (
+              <TrailerPlayer
+                trailerKey={trailerKey}
+                poster={`https://image.tmdb.org/t/p/w780${movie.backdrop_path}`}
+              />
+            ) : (
+              <div className='relative w-full aspect-video rounded-2xl overflow-hidden bg-black shadow-2xl ring-1 ring-white/10'>
+                <div
+                  className='relative w-full h-full bg-cover bg-center cursor-pointer group'
+                  style={{
+                    backgroundImage: `url(https://image.tmdb.org/t/p/w780${movie.backdrop_path})`
+                  }}
+                  onClick={() => setPlayTrailer(true)}
+                >
+                  <div className='absolute inset-0 bg-black/40 group-hover:bg-black/30 transition-colors' />
+
+                  <div className='absolute inset-0 flex items-center justify-center'>
+                    <div className='group-hover:scale-110 transition-transform duration-300'>
+                      <svg width="72" height="72" viewBox="0 0 100 100">
+                        <path
+                          d="M30 20 L30 80 L82 50 Z"
+                          fill="#22c55e"
+                          style={{ filter: 'drop-shadow(0 0 16px rgba(34,197,94,0.5))' }}
+                        />
+                      </svg>
+                    </div>
+                  </div>
+
+                  <div className='absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black/80 to-transparent'>
+                    <p className='text-white/90 text-sm font-medium'>▶ Play Trailer</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <a
+              href={`https://www.youtube.com/watch?v=${trailerKey}`}
+              target='_blank'
+              rel='noopener noreferrer'
+              className='block text-center text-white/40 text-xs mt-3 hover:text-white/70 transition-colors'
+            >
+              Открыть на YouTube
+            </a>
+          </div>
+        </div>
+      )}
     </div>
   )
    

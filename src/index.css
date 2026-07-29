@@ -108,3 +108,8 @@
     rgb(10 10 10 / 0) 35%,
     #0a0a0a 100%);
 }
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
