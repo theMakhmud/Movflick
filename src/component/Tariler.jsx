@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 
+
 const TrailerPlayer = ({ trailerKey, poster }) => {
   const playerRef = useRef(null)
   const containerRef = useRef(null)
@@ -246,18 +247,19 @@ const TrailerPlayer = ({ trailerKey, poster }) => {
           >
             <div className='w-full h-1 bg-white/25 rounded-full overflow-hidden'>
               <div className='h-full bg-primary rounded-full' style={{ width: `${progress}%` }} />
-
+            </div>
             <div
               className='absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-primary shadow opacity-0 group-hover:opacity-100 transition-opacity'
               style={{ left: `${progress}%` }}
             />
           </div>
+
           <div className='flex items-center justify-between text-white'>
             <span className='text-[11px] font-medium tabular-nums text-white/80 leading-none'>
               {fmt(current)} / {fmt(duration)}
             </span>
 
-
+            <div className='flex items-center gap-2.5'>
               <button
                 onClick={(e) => { e.stopPropagation(); toggleMute() }}
                 className='w-7 h-7 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors cursor-pointer'
@@ -272,7 +274,6 @@ const TrailerPlayer = ({ trailerKey, poster }) => {
                   </svg>
                 )}
               </button>
-
 
               <button
                 onClick={(e) => { e.stopPropagation(); toggleFullscreen() }}
