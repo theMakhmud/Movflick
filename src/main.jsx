@@ -3,14 +3,17 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.jsx'
 import { BrowserRouter } from 'react-router-dom'
-import { Context } from './Context.jsx'
+import { Context } from './FavContext.jsx'
+import { AuthProvider } from './AuthContext'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <BrowserRouter basename="/Movflick">
-      <Context>
-        <App />
-      </Context>
+    <BrowserRouter basename="/Movflick/">
+      <AuthProvider>
+        <Context>
+          <App />
+        </Context>
+      </AuthProvider>
     </BrowserRouter>
   </StrictMode>
 )

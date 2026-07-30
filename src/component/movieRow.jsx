@@ -1,11 +1,22 @@
 import React from 'react'
 import star from '../assets/Movflick-selection.png'
 import playIcon from '../assets/Movflick-logo.png'
-import { Link } from 'react-router-dom'
-import { useFavorites } from '../Context'
+import { Link, useNavigate } from 'react-router-dom'
+import { useFavorites } from '../FavContext'
+import { useAuth } from '../AuthContext'
 
 const MovieRow = ({title, movieList, genreList}) => {
     const { toggleFav, isFavorites } = useFavorites()
+    const navigate = useNavigate()
+    const { user, authLoading } = useAuth()
+
+    const handleFav = (e, movie) => {
+        e.preventDefault()
+        e.stopPropagation()
+
+        const ok = toggleFav(movie)
+        if (!ok) navigate('/auth')
+    }
     return (
         <div className='flex flex-col gap-2'>
             <div className='flex justify-between py-1 items-center'>
@@ -35,13 +46,9 @@ const MovieRow = ({title, movieList, genreList}) => {
                                             <p className='text-xs font-semibold'>{movie.vote_average?.toFixed(1)}</p>
                                         </span>
                                         <button
-                                            onClick={(e) => {
-                                                e.preventDefault()      
-                                                e.stopPropagation()     
-                                                toggleFav(movie)
-                                            }}
+                                            onClick={(e) => handleFav(e, movie)}
                                             className='size-7 flex items-center justify-center rounded-full bg-base'>
-                                            <svg className={`size-4 ${isFavorites(movie.id) ? 'text-primary-hover' : 'text-white'}`} fill={isFavorites(movie.id) ? 'currentColor' : 'none'} xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                            <svg className={`size-4 ${isFavorites(movie.id) && user ? 'text-primary-hover' : 'text-white'}`} fill={isFavorites(movie.id) && user ? 'currentColor' : 'none'} xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                                 <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                                                 <path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572" />
                                             </svg>

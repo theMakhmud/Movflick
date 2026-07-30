@@ -1,7 +1,7 @@
 import React, { use, useEffect, useState } from 'react'
 import star from '../assets/Movflick-selection.png'
 import playIcon from '../assets/Movflick-logo.png'
-import { useFavorites } from '../Context'
+import { useFavorites } from '../FavContext'
 import MovieRow from './movieRow'
 
 

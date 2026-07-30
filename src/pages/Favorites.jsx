@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { useFavorites } from '../Context'
+import { useFavorites } from '../FavContext'
 import star from '../assets/Movflick-selection.png'
 import { Link } from 'react-router-dom'
 

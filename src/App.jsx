@@ -5,6 +5,7 @@ import MoviePage from './pages/MoviePage'
 import Favorites from './pages/Favorites'
 import Profile from './pages/Profile'
 import Layout from './component/Layout'
+import Register from './pages/Register'
 
 const App = () => {
   return (
@@ -15,6 +16,7 @@ const App = () => {
         <Route path='/movie/' element={<MoviePage />} />
         <Route path='/favorites' element={<Favorites />} />
         <Route path='/profile' element={<Profile />} />
+        <Route path='/auth' element={<Register />} />
       </Route>
     </Routes>
   )

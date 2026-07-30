@@ -4,8 +4,9 @@ import Loading from '../component/loading'
 import star from '../assets/Movflick-selection.png'
 import playIcon from '../assets/Movflick-logo.png'
 import { useNavigate } from 'react-router-dom'
-import { useFavorites } from '../Context'
+import { useFavorites } from '../FavContext'
 import MovieRow from '../component/movieRow'
+import { useAuth } from '../AuthContext'
 
 const API_BASE_TMDB = "https://api.themoviedb.org/3"
 const API_KEY = import.meta.env.VITE_TMDB_API
@@ -20,6 +21,8 @@ const API_OPTION = {
 
 const MoviePage = () => {
   const { toggleFav, isFavorites } = useFavorites()
+
+  const { user, authLoading } = useAuth()
   
   const { id } = useParams()
   const [movie, setMovie] = useState(null)
@@ -117,6 +120,14 @@ const MoviePage = () => {
     }
   }
 
+  const handleFav = (e, movie) => {
+      e.preventDefault()
+      e.stopPropagation()
+
+      const ok = toggleFav(movie)
+      if (!ok) navigate('/auth')
+  }
+
   return (
     <div className='w-full flex flex-col mb-10'>
       <div
@@ -131,13 +142,9 @@ const MoviePage = () => {
           </button>
 
           <button
-            onClick={(e) => {
-                e.preventDefault()      
-                e.stopPropagation()     
-                toggleFav(movie)
-            }}
+            onClick={(e) => handleFav(e, movie)}
             className='size-10 flex items-center justify-center rounded-full bg-base'>
-            <svg className={`size-5 ${isFavorites(movie.id) ? 'text-primary' : 'text-white'}`} fill={isFavorites(movie.id) ? 'currentColor' : 'none'} xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg className={`size-5 ${isFavorites(movie.id) && user ? 'text-primary' : 'text-white'}`} fill={isFavorites(movie.id) && user ? 'currentColor' : 'none'} xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                 <path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572" />
             </svg>
