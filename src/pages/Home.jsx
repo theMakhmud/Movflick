@@ -1,11 +1,11 @@
 import React, { use, useEffect, useState } from 'react'
-import Header from '../component/header'
-import Search from '../component/search'
-import Genre from '../component/genre'
-import Hero from '../component/hero'
-import Trend from '../component/rowTrend'
-import Popular from '../component/popular'
-import HeroMovies from '../component/heroMovies'
+import Header from '../component/Header'
+import Search from '../component/Search'
+import Filter from '../component/Filter'
+import Hero from '../component/heroMovie'
+import Trend from '../component/movieCol'
+import MovieRow from '../component/movieRow'
+import Filtered from '../component/selectedFilter'
 import Loading from '../component/loading'
 import TabBar from '../component/tabBar'
 
@@ -71,7 +71,7 @@ const App = () => {
       <Header />
       <Search value={searchTerm} setValue={setSearchTerm} />
       {/* <Genre selectedGenre={selectedGenre} setSelectedGenre={setSelectedGenre} genreList={genreList} /> */}
-       { !searchTerm.trim() && <Genre movieList={movieList} genreList={genreList} selectedGenre={selectedGenre} setSelectedGenre={setSelectedGenre} /> }
+       { !searchTerm.trim() && <Filter movieList={movieList} genreList={genreList} selectedGenre={selectedGenre} setSelectedGenre={setSelectedGenre} /> }
 
       <main className='px-4 py-1 mb-18 flex flex-col gap-3'>
         {isLoading ? (
@@ -80,7 +80,7 @@ const App = () => {
           <p className='text-danger'>{errorMessage}</p>
         ) : searchTerm.length >= 1 ? (
           <section>
-            <HeroMovies genreList={genreList} movieList={movieList} />
+            <Filtered title={searchTerm} genreList={genreList} movieList={movieList} />
           </section>
         ) : selectedGenre === null ? (
           <>
@@ -91,12 +91,12 @@ const App = () => {
               <Trend movieList={trendList} genreList={genreList} />
             </section>
             <section>
-              <Popular movieList={popularList} genreList={genreList} />
+              <MovieRow title={'Popular Right Now'} movieList={popularList} genreList={genreList} />
             </section>
           </>
         ) : (
           <section>
-            <HeroMovies genreId={selectedGenre} genreList={genreList} movieList={movieList} />
+            <Filtered genreId={selectedGenre} genreList={genreList} movieList={movieList} />
           </section>
         )}
       </main>

@@ -4,12 +4,12 @@ import playIcon from '../assets/Movflick-logo.png'
 import { Link } from 'react-router-dom'
 import { useFavorites } from '../Context'
 
-const Popular = ({movieList, genreList}) => {
+const MovieRow = ({title, movieList, genreList}) => {
     const { toggleFav, isFavorites } = useFavorites()
     return (
         <div className='flex flex-col gap-2'>
             <div className='flex justify-between py-1 items-center'>
-                <h2 className='text-lg'>Popular Right Now</h2>
+                <h2 className='text-lg'>{title}</h2>
             </div>
 
             <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3'>
@@ -41,7 +41,7 @@ const Popular = ({movieList, genreList}) => {
                                                 toggleFav(movie)
                                             }}
                                             className='size-7 flex items-center justify-center rounded-full bg-base'>
-                                            <svg className={`size-4 ${isFavorites(movie.id) ? 'text-primary' : 'text-white'}`} fill={isFavorites(movie.id) ? 'currentColor' : 'none'} xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                            <svg className={`size-4 ${isFavorites(movie.id) ? 'text-primary-hover' : 'text-white'}`} fill={isFavorites(movie.id) ? 'currentColor' : 'none'} xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                                 <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                                                 <path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572" />
                                             </svg>
@@ -62,4 +62,4 @@ const Popular = ({movieList, genreList}) => {
     )
 }
 
-export default Popular
+export default MovieRow

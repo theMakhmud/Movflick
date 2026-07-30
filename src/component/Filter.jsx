@@ -1,6 +1,6 @@
 import React from 'react'
 
-const Genre = ({movieList, genreList,selectedGenre, setSelectedGenre}) => {
+const Filter = ({movieList, genreList,selectedGenre, setSelectedGenre}) => {
     const genre = movieList.flatMap(movie => movie.genre_ids)
     const id = [...new Set(genre)]
 
@@ -27,4 +27,4 @@ const Genre = ({movieList, genreList,selectedGenre, setSelectedGenre}) => {
   )
 }
 
-export default Genre
+export default Filter
