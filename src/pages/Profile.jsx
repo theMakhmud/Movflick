@@ -1,13 +1,17 @@
 import React, { useEffect } from 'react'
 import { account } from '../lib/appwrite'
+import { useAuth } from '../AuthContext'
 
 const Profile = () => {
+  const {logout} = useAuth()
 
-  useEffect(() => {
-    account.get()
-      .then(user => console.log('Залогинен:', user))
-      .catch(err => console.log('Не залогинен (это нормально):', err.message))
-  }, [])
+  return (
+    <button
+    onClick={() => logout()}
+    className='button'>
+      <p>logout</p>
+    </button>
+  )
 }
 
 export default Profile
