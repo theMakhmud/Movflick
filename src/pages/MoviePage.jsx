@@ -20,7 +20,7 @@ const API_OPTION = {
 }
 
 const MoviePage = () => {
-  const { toggleFav, isFavorites } = useFavorites()
+  const { toggleFav, isFavorites, toggleWatched, isWatched, togglePlanned, isPlanned } = useFavorites()
 
   const { user, authLoading } = useAuth()
   
@@ -33,6 +33,17 @@ const MoviePage = () => {
 
   const [trailerKey, setTrailerKey] = useState(null)
   const [showTrailer, setShowTrailer] = useState(false)
+  
+  const [showNone, setShowNone] = useState(false)
+  const [isClosing, setIsClosing] = useState(false)
+
+  const closeSheet = (duration = 250) => {
+    setIsClosing(true)
+    setTimeout(() => {
+      setShowNone(false)
+      setIsClosing(false)
+    }, duration)
+  }
 
   const navigate = useNavigate()
 
@@ -128,6 +139,36 @@ const MoviePage = () => {
       if (!ok) navigate('/auth')
   }
 
+  const handleWatched = async (e, movie) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    const ok = await toggleWatched(movie)
+
+    if (!ok) {
+      closeSheet()
+      navigate('/auth')
+      return
+    }
+
+    closeSheet()
+  }
+
+  const handlePlanned = async (e, movie) => {
+      e.preventDefault()
+      e.stopPropagation()
+
+      const ok = await togglePlanned(movie)
+
+      if (!ok) {
+        closeSheet()
+        navigate('/auth')
+        return
+      }
+
+      closeSheet()
+  }
+
   return (
     <div className='w-full flex flex-col mb-10'>
       <div
@@ -194,7 +235,9 @@ const MoviePage = () => {
             </span>
           </button>
 
-          <button className='w-12 h-12 shrink-0 rounded-full border border-white/20 flex items-center justify-center cursor-pointer active:scale-95 transition-transform'>
+          <button 
+          onClick={() => setShowNone(true)}
+          className='w-12 h-12 shrink-0 rounded-full border border-white/20 flex items-center justify-center cursor-pointer active:scale-95 transition-transform'>
             <svg className='w-6 h-6 text-white' viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" strokeWidth="2" strokeLinecap="round">
               <path d="M12 5v14M5 12h14" />
@@ -267,6 +310,78 @@ const MoviePage = () => {
             >
               Не воспроизводится? Открыть на YouTube
             </a>
+          </div>
+        </div>
+      )}
+
+      {showNone && (
+        <div
+          className={`fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-end justify-center ${
+          isClosing
+              ? 'animate-[fadeOut_0.25s_ease-out_forwards]'
+              : 'animate-[fadeIn_0.2s_ease-out]'
+          }`}
+          onClick={closeSheet}
+        >
+          <div
+            className={`relative w-full max-w-4xl bg-tabbar rounded-t-3xl pb-17 ${
+            isClosing
+                ? 'animate-[slideDown_0.25s_ease-out_forwards]'
+                : 'animate-[slideUp_0.25s_ease-out]'
+            }`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className='flex justify-center pt-3 pb-2'>
+              <div className='w-10 h-1 rounded-full bg-white/20' />
+            </div>
+
+            <div className='px-5 pb-3'>
+              <h3 className='text-lg font-bold text-white'>Add to list</h3>
+            </div>
+
+            <div className='px-3 flex flex-col gap-1'>
+
+              <button
+              onClick={(e) => handleWatched(e, movie)}
+              className={`w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-colors cursor-pointer
+              ${isWatched(movie.id) && user
+                ? 'bg-primary/10 border border-primary/30 hover:bg-primary/15'
+                : 'bg-transparent border border-transparent hover:bg-white/5 active:bg-white/10'
+              }`}>
+                <div className='w-11 h-11 shrink-0 rounded-full bg-white/5 flex items-center justify-center'>
+                  <svg className='w-5 h-5 text-white/60' viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12 6 12 12 16 14" />
+                  </svg>
+                </div>
+                <div className='flex-1 text-left'>
+                  <p className='text-sm font-semibold text-white'>Watch later</p>
+                  <p className='text-xs text-white/40'>Save for future viewing</p>
+                </div>
+              </button>
+
+              <button
+              onClick={(e) => handlePlanned(e, movie)}
+              className={`w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-colors cursor-pointer
+              ${isPlanned(movie.id) && user
+                ? 'bg-primary/10 border border-primary/30 hover:bg-primary/15'
+                : 'bg-transparent border border-transparent hover:bg-white/5 active:bg-white/10'
+              }`}>
+                <div className='w-11 h-11 shrink-0 rounded-full bg-white/5 flex items-center justify-center'>
+                  <svg className='w-5 h-5 text-white/60' viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                </div>
+                <div className='flex-1 text-left'>
+                  <p className='text-sm font-semibold text-white'>Watched</p>
+                  <p className='text-xs text-white/40'>Mark as already seen</p>
+                </div>
+              </button>
+
+            </div>
           </div>
         </div>
       )}

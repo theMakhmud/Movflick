@@ -5,7 +5,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useFavorites } from '../FavContext'
 import { useAuth } from '../AuthContext'
 
-const Trend = ({movieList, genreList}) => {
+const Trend = ({title,movieList, genreList}) => {
   const { toggleFav, isFavorites } = useFavorites()
 
     const navigate = useNavigate()
@@ -21,13 +21,13 @@ const Trend = ({movieList, genreList}) => {
   return (
     <div className='flex flex-col gap-2'>
         <div className='flex justify-between items-center'>
-            <h2 className='text-lg'>Trending Now</h2>
-            <a className='text-primary text-sm font-semibold' href="#">See all</a>
+            <h2 className='text-lg'>{title}</h2>
+            {/* <a className='text-primary text-sm font-semibold' href="#">See all</a> */}
         </div>
         <div className='flex flex-1 gap-2  overflow-x-auto scrollbar-hide'>
              {movieList?.map( (movie) => {
 
-                const genreName = genreList?.find(g => g.id === movie.genre_ids?.[0])?.name
+                const genreName = genreList?.find(g => g.id === movie.genre_ids?.[0])?.name || movie.genres?.[0]?.name
                 const year = movie.release_date?.split('-')[0]
 
                 return (
@@ -60,7 +60,7 @@ const Trend = ({movieList, genreList}) => {
 
                             <div className=' px-2 py-2 '>
                                 <h2 className='text-sm font-semibold'>{movie.title}</h2>
-                                <div className="text-sm text-gray font-medium">{genreName} · {year}</div>
+                                <div className="text-sm text-gray font-medium">{genreName ? genreName : movie.genre_ids} · {year}</div>
                             </div>
                         </div>
                     </Link>

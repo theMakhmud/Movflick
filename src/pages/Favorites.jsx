@@ -14,7 +14,6 @@ const API_OPTION = {
   }
 }
 
-// ── Отдельный компонент карточки со своим состоянием ──
 const FavoriteCard = ({ movie, genre }) => {
   const { toggleFav, isFavorites } = useFavorites()
   const [isToggling, setIsToggling] = useState(false)
@@ -74,7 +73,6 @@ const FavoriteCard = ({ movie, genre }) => {
   )
 }
 
-// ── Основной компонент страницы ──
 const Favorites = () => {
   const [genre, setGenre] = useState()
   const { favorites } = useFavorites()

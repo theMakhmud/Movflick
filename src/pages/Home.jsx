@@ -88,7 +88,7 @@ const App = () => {
               <Hero movie={movieList} genreList={genreList} />
             </section>
             <section className='pb-3 pt-1'>
-              <Trend movieList={trendList} genreList={genreList} />
+              <Trend movieList={trendList} title={'Trending Now'} genreList={genreList} />
             </section>
             <section>
               <MovieRow title={'Popular Right Now'} movieList={popularList} genreList={genreList} />

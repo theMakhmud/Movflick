@@ -1,40 +1,116 @@
-import { createContext, useContext, useState, useEffect } from 'react'
+import React, { createContext, useContext, useState, useEffect } from 'react'
+import { databases } from './lib/appwrite'
+import { ID, Query, Permission, Role } from 'appwrite'
 import { useAuth } from './AuthContext'
 
-const FavContext = createContext()
+const DB_ID = import.meta.env.VITE_APPWRITE_DB_ID
+const COLLECTION_ID = import.meta.env.VITE_APPWRITE_COLLECTION_ID
 
-export const Context = ({ children }) => {
+const FavoritesContext = createContext()
 
-    const { user } = useAuth()
+export const FavoritesProvider = ({ children }) => {
+  const { user } = useAuth()
 
-    const [favorites, setFavorites] = useState(() => {
-        const saved = localStorage.getItem('favorites')
-        return saved ? JSON.parse(saved) : []
-    })
+  const [items, setItems] = useState([])
+  const [listsLoading, setListsLoading] = useState(false)
 
-    useEffect(() => {
-        localStorage.setItem('favorites', JSON.stringify(favorites))
-    }, [favorites])
+  useEffect(() => {
+    if (!user) {
+      setItems([])
+      return
+    }
 
-    const toggleFav = ((movie) => {
-        if (!user) return false
-        setFavorites((prev) => {
-            const exists = prev.find(m => m.id === movie.id)
-            return exists
-            ? prev.filter(m => m.id !== movie.id)
-            : [...prev, movie]
-        })
-        return true
-    })
+    const fetchLists = async () => {
+      try {
+        setListsLoading(true)
+        const res = await databases.listDocuments(DB_ID, COLLECTION_ID, [
+          Query.equal('userId', user.$id),
+          Query.limit(200)
+        ])
 
-    const isFavorites = (id) => favorites.some(m => m.id === id)
+        setItems(res.documents.map(doc => ({
+          docId: doc.$id,
+          movieId: doc.movieId,
+          listType: doc.listType,
+          movie: JSON.parse(doc.movieData)
+        })))
+      } catch (err) {
+        console.error('Failed loading lists:', err)
+      } finally {
+        setListsLoading(false)
+      }
+    }
 
-    return (
-        <FavContext.Provider value={{favorites, toggleFav, isFavorites}}>
-            { children }
-        </FavContext.Provider>
+    fetchLists()
+  }, [user])
+
+  const toggleInList = async (movie, listType) => {
+
+    const existing = items.find(
+      i => i.movieId === movie.id && i.listType === listType
     )
+
+    try {
+      if (existing) {
+        await databases.deleteDocument(DB_ID, COLLECTION_ID, existing.docId)
+        setItems(prev => prev.filter(i => i.docId !== existing.docId))
+      } else {
+        const doc = await databases.createDocument(
+            DB_ID,
+            COLLECTION_ID,
+            ID.unique(),
+          {
+            userId: user.$id,
+            movieId: movie.id,
+            listType,
+            movieData: JSON.stringify(movie)
+          },
+          [
+            Permission.read(Role.user(user.$id)),
+            Permission.update(Role.user(user.$id)),
+            Permission.delete(Role.user(user.$id))
+          ]
+        )
+        setItems(prev => [...prev, {
+          docId: doc.$id,
+          movieId: movie.id,
+          listType,
+          movie
+        }])
+      }
+      return true
+    } catch (err) {
+      console.error('Toggle failed:', err)
+      return true 
+    }
+  }
+
+
+  const toggleFav = (movie) => toggleInList(movie, 'favorite')
+  const toggleWatched = (movie) => toggleInList(movie, 'watched')
+  const togglePlanned = (movie) => toggleInList(movie, 'planned')
+
+  const isFavorites = (id) =>
+    items.some(i => i.movieId === id && i.listType === 'favorite')
+  const isWatched = (id) =>
+    items.some(i => i.movieId === id && i.listType === 'watched')
+  const isPlanned = (id) =>
+    items.some(i => i.movieId === id && i.listType === 'planned')
+
+  const favorites = items.filter(i => i.listType === 'favorite').map(i => i.movie)
+  const watched = items.filter(i => i.listType === 'watched').map(i => i.movie)
+  const planned = items.filter(i => i.listType === 'planned').map(i => i.movie)
+
+  return (
+    <FavoritesContext.Provider value={{
+      favorites, toggleFav, isFavorites,
+      watched, toggleWatched, isWatched,
+      planned, togglePlanned, isPlanned,
+      listsLoading
+    }}>
+      {children}
+    </FavoritesContext.Provider>
+  )
 }
 
-export const useFavorites = () => useContext(FavContext)
-
+export const useFavorites = () => useContext(FavoritesContext)

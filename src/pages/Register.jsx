@@ -6,7 +6,7 @@ import { useAuth } from '../AuthContext'
 
 const RegisterCard = ({ switchToLogin, name, setName, nameError, email, setEmail, emailError, password, setPassword, passError, onSubmit }) => {
   return (
-    <div className='min-h-screen flex flex-col items-center justify-center px-6 py-10'>
+    <div className='max-h-screen flex flex-col items-center justify-center px-6 py-16'>
 
       <div className='flex flex-col items-center mb-10'>
         <h1 className='text-3xl font-extrabold text-white'>Create Account</h1>
@@ -85,7 +85,7 @@ const RegisterCard = ({ switchToLogin, name, setName, nameError, email, setEmail
 
 const LoginCard = ({ switchToRegister, email, setEmail, emailError, password, setPassword, passError, onSubmit}) => {
   return (
-    <div className='min-h-screen flex flex-col items-center justify-center px-6 py-10'>
+    <div className='max-h-screen flex flex-col items-center justify-center px-6 py-15'>
 
       <div className='flex flex-col items-center mb-10'>
         <h1 className='text-3xl font-extrabold text-white'>Welcome Back</h1>
@@ -210,7 +210,15 @@ const Register = () => {
 
     } catch (err) {
       console.error(err)
-      setEmailError(err.message)
+      if (err.code === 409) {
+        setEmailError('Этот email уже используется.')
+      } else if (err.code === 401) {
+        setEmailError('Неверный email или пароль')
+      } else if (err.code === 429) {
+        setEmailError('Слишком много попыток. Подождите немного.')
+      } else {
+        setEmailError(err.message)
+      }
     } finally {
       setIsLoading(false)
     }
@@ -256,7 +264,7 @@ const Register = () => {
       return 'Введите пароль'
     }
     if (password.length < 8) {
-      return 'Пароль слишком короткий (минимум 8 символов)'
+      return 'минимум 8 символов'
     }
     if (password.length > 40) {
       return 'Пароль слишком длинный'
