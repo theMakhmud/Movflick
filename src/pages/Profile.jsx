@@ -26,11 +26,42 @@ const EmptySection = ({ icon, title, hint }) => (
 )
 
 const Profile = () => {
-  const { logout, user } = useAuth()
+  const { logout, user, needsVerification, verifyDeadline, resendVerification } = useAuth()
   const { watched, planned } = useFavorites()
   const navigate = useNavigate()
 
   const [genre, setGenre] = useState([])
+
+  const [timeLeft, setTimeLeft] = useState('')
+  const [resent, setResent] = useState(false)
+  const [resendLoading, setResendLoading] = useState(false)
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
+
+  useEffect(() => {
+    if (!needsVerification || !verifyDeadline) return
+
+    const update = () => {
+      const ms = Math.max(0, verifyDeadline - Date.now())
+      const h = Math.floor(ms / 3600000)
+      const m = Math.floor((ms % 3600000) / 60000)
+      setTimeLeft(`${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`)
+    }
+    update()
+    const interval = setInterval(update, 30000)
+    return () => clearInterval(interval)
+  }, [needsVerification, verifyDeadline])
+
+  const handleResend = async () => {
+    try {
+      setResendLoading(true)
+      await resendVerification()
+      setResent(true)
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setResendLoading(false)
+    }
+  }
 
   useEffect(() => {
     const fetchGenres = async () => {
@@ -51,7 +82,36 @@ const Profile = () => {
   }
 
   return (
-    <div className='px-4 py-8 pb-25'>
+    <div className='px-4 py-8 pb-25 lg:pb-12 lg:max-w-4xl lg:mx-auto'>
+
+      {needsVerification && (
+        <div className='mb-6 rounded-2xl border border-danger/40 bg-danger/10 p-4 flex items-start gap-3'>
+          <svg className='w-5 h-5 text-danger shrink-0 mt-0.5' viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" />
+            <line x1="12" y1="9" x2="12" y2="13" />
+            <line x1="12" y1="17" x2="12.01" y2="17" />
+          </svg>
+          <div>
+            <p className='text-sm font-bold text-danger'>Verify your email</p>
+            <p className='text-xs text-white/60 mt-1 leading-relaxed'>
+              We sent a confirmation link to <span className='text-white/90'>{user?.email}</span>.
+              You will be logged out in <span className='text-danger font-semibold'>{timeLeft}</span> unless you verify it.
+            </p>
+            {resent ? (
+              <p className='text-xs text-primary font-semibold mt-2'>Email sent again — check your inbox</p>
+            ) : (
+              <button
+                onClick={handleResend}
+                disabled={resendLoading}
+                className='text-xs font-semibold text-danger underline mt-2 cursor-pointer disabled:opacity-50'
+              >
+                {resendLoading ? 'Sending...' : 'Resend email'}
+              </button>
+            )}
+          </div>
+        </div>
+      )}
 
       <div className='flex flex-col items-center'>
         <div
@@ -121,20 +181,56 @@ const Profile = () => {
 
       </div>
 
-      <div className='w-full h-px bg-white/10 my-8' />
+      {user && (
+        <>
+          <div className='w-full h-px bg-white/10 my-8' />
 
-      <button
-        onClick={handleLogout}
-        className='w-full flex items-center justify-center gap-2 py-4 rounded-full border border-danger text-danger font-semibold cursor-pointer hover:bg-red-400/10 active:scale-[0.98] transition-all'
-      >
-        <svg className='w-5 h-5' viewBox="0 0 24 24" fill="none" stroke="currentColor"
-             strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-          <polyline points="16 17 21 12 16 7" />
-          <line x1="21" y1="12" x2="9" y2="12" />
-        </svg>
-        Log out
-      </button>
+          <button
+            onClick={() => setShowLogoutConfirm(true)}
+            className='w-full flex items-center justify-center gap-2 py-4 rounded-full border border-danger text-danger font-semibold cursor-pointer hover:bg-red-400/10 active:scale-[0.98] transition-all'
+          >
+            <svg className='w-5 h-5' viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+            Log out
+          </button>
+        </>
+      )}
+
+      {showLogoutConfirm && (
+        <div
+          className='fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center px-6'
+          onClick={() => setShowLogoutConfirm(false)}
+        >
+          <div
+            className='relative w-full max-w-sm bg-tabbar rounded-2xl p-6'
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className='text-xl font-bold text-white'>Log out?</h3>
+            <p className='text-sm text-white/60 mt-2 leading-relaxed'>
+              Are you sure you want to log out of your account?
+            </p>
+
+            <div className='flex flex-col gap-2 mt-6'>
+              <button
+                onClick={() => setShowLogoutConfirm(false)}
+                className='w-full py-3.5 rounded-full border border-white/20 text-white font-semibold cursor-pointer hover:bg-white/5 active:scale-[0.98] transition-all'
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleLogout}
+                className='w-full py-3.5 rounded-full bg-red-500 text-white font-bold cursor-pointer active:scale-[0.98] transition-transform'
+              >
+                Log out
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   )

@@ -1,4 +1,4 @@
-import React, { use, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Header from '../component/Header'
 import Search from '../component/Search'
 import Filter from '../component/Filter'
@@ -7,7 +7,6 @@ import Trend from '../component/movieCol'
 import MovieRow from '../component/movieRow'
 import Filtered from '../component/selectedFilter'
 import Loading from '../component/loading'
-import TabBar from '../component/tabBar'
 
 const API_BASE_TMDB = "https://api.themoviedb.org/3"
 const API_KEY = import.meta.env.VITE_TMDB_API
@@ -67,13 +66,12 @@ const App = () => {
   }, [searchTerm])
 
   return (
-    <div className="wrapper">
+    <div className="wrapper lg:max-w-6xl lg:mx-auto lg:px-2 lg:pt-4">
       <Header />
       <Search value={searchTerm} setValue={setSearchTerm} />
-      {/* <Genre selectedGenre={selectedGenre} setSelectedGenre={setSelectedGenre} genreList={genreList} /> */}
        { !searchTerm.trim() && <Filter movieList={movieList} genreList={genreList} selectedGenre={selectedGenre} setSelectedGenre={setSelectedGenre} /> }
 
-      <main className='px-4 py-1 mb-18 flex flex-col gap-3'>
+      <main className='px-4 py-1 mb-18 lg:mb-10 flex flex-col gap-3 lg:gap-8'>
         {isLoading ? (
           <Loading />
         ) : errorMessage ? (

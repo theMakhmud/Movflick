@@ -1,10 +1,12 @@
 import { useState } from "react"
 import React from 'react'
 import { useLocation, Link } from 'react-router-dom'
+import { useAuth } from '../AuthContext'
 
 const TabBar = () => {
 
-    const location = useLocation() 
+    const location = useLocation()
+    const { needsVerification } = useAuth()
 
     const buttons = [
         {
@@ -56,22 +58,26 @@ const TabBar = () => {
         },
     ]
     return (
-        <div className='fixed z-50 w-full bottom-0 flex justify-between bg-tabbar px-2 py-1'>
+        <div className='fixed z-50 w-full bottom-0 flex justify-between bg-tabbar px-2 py-1 lg:hidden'>
 
             {buttons.map((btn) => {
                 const isActive = btn.path === '/'
                 ? location.pathname === '/'
                 : location.pathname.startsWith(btn.path)
                 return (
-                    <button>
+                    <button key={btn.id}>
                         <Link
-                            key={btn.id}
                             to={btn.path}
                             className={`w-20 py-2 flex items-center justify-center flex-col gap-1 ${
                             isActive ? 'text-primary' : 'text-muted'
                             }`}
                         >
-                            {btn.svg}
+                            <div className='relative'>
+                                {btn.svg}
+                                {btn.text === 'profile' && needsVerification && (
+                                    <span className='absolute -top-1 -right-1 w-2.5 h-2.5 bg-danger rounded-full border-2 border-tabbar' />
+                                )}
+                            </div>
                             <p className='text-xs font-medium capitalize'>{btn.text}</p>
                         </Link>
                     </button>

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import Loading from '../component/loading'
 import star from '../assets/Movflick-selection.png'
-import playIcon from '../assets/Movflick-logo.png'
 import { useNavigate } from 'react-router-dom'
 import { useFavorites } from '../FavContext'
 import MovieRow from '../component/movieRow'
@@ -22,8 +21,8 @@ const API_OPTION = {
 const MoviePage = () => {
   const { toggleFav, isFavorites, toggleWatched, isWatched, togglePlanned, isPlanned } = useFavorites()
 
-  const { user, authLoading } = useAuth()
-  
+  const { user } = useAuth()
+
   const { id } = useParams()
   const [movie, setMovie] = useState(null)
   const [errerMessage, setErrorMessage] = useState('')
@@ -75,8 +74,6 @@ const MoviePage = () => {
         const similarData = await similarRes.json()
         const genreData = await genreRes.json()
         const videosData = await videoRes.json()
-
-        console.log(videosData)
 
         const trailer = videosData.results.find(
           v => v.site === 'YouTube' && v.type === 'Trailer'
@@ -170,10 +167,10 @@ const MoviePage = () => {
   }
 
   return (
-    <div className='w-full flex flex-col mb-10'>
+    <div className='w-full flex flex-col mb-10 lg:mb-16 lg:max-w-6xl lg:mx-auto lg:px-6 lg:pt-8'>
+      <div className='lg:grid lg:grid-cols-2 lg:gap-10 lg:items-start'>
       <div
-        className='w-full aspect-video bg-cover bg-center relative'
-        kay={movie.id}
+        className='w-full aspect-video bg-cover bg-center relative lg:rounded-2xl lg:overflow-hidden lg:sticky lg:top-20'
         style={{
           backgroundImage: `url(https://image.tmdb.org/t/p/w780${movie.backdrop_path})`
         }}>
@@ -184,7 +181,7 @@ const MoviePage = () => {
 
           <button
             onClick={(e) => handleFav(e, movie)}
-            className='size-10 flex items-center justify-center rounded-full bg-base'>
+            className='relative size-10 flex items-center justify-center rounded-full bg-base after:absolute after:-inset-2 after:content-[""]'>
             <svg className={`size-5 ${isFavorites(movie.id) && user ? 'text-primary' : 'text-white'}`} fill={isFavorites(movie.id) && user ? 'currentColor' : 'none'} xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                 <path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572" />
@@ -193,9 +190,9 @@ const MoviePage = () => {
         </span>
       </div>
 
-      <div className='px-5 pt-3 z-10 flex flex-col gap-4 mb-10'>
+      <div className='px-5 pt-3 z-10 flex flex-col gap-4 mb-10 lg:px-0 lg:pt-0 lg:mb-0'>
 
-        <h1 className='text-3xl font-extrabold leading-tight'>{movie.title}</h1>
+        <h1 className='text-3xl lg:text-4xl font-extrabold leading-tight'>{movie.title}</h1>
 
         <div className='flex items-center gap-2 flex-wrap text-sm text-[#FFFFFFBF] font-medium'>
           <span>{movie.release_date?.split('-')[0]}</span>
@@ -264,22 +261,23 @@ const MoviePage = () => {
           </p>
         </div>
 
-        <div className='flex flex-col gap-2 pt-4'>
-          <div className='flex justify-between py-1 items-center'>
-              <h2 className='text-lg'>Similar Movies</h2>
-          </div>
-          
-          <div>
-            {similar?.length === 0 ? (
-              <div className='px-5 py-5 text-[#FFFFFF66] rounded-2xl text-sm border border-dashed border-[#FFFFFF1F]'>
-                <p>No similar movies yet — check back after release.</p>
-              </div>
-            ) : (
-              <MovieRow movieList={similar} genreList={genre} />
-            )}
-          </div>
+      </div>
+      </div>
+
+      <div className='px-5 flex flex-col gap-2 pt-4 lg:px-0 lg:pt-12'>
+        <div className='flex justify-between py-1 items-center'>
+            <h2 className='text-lg lg:text-2xl lg:font-bold'>Similar Movies</h2>
         </div>
 
+        <div>
+          {similar?.length === 0 ? (
+            <div className='px-5 py-5 text-[#FFFFFF66] rounded-2xl text-sm border border-dashed border-[#FFFFFF1F]'>
+              <p>No similar movies yet — check back after release.</p>
+            </div>
+          ) : (
+            <MovieRow movieList={similar} genreList={genre} />
+          )}
+        </div>
       </div>
 
       { showTrailer && trailerKey && (
@@ -316,7 +314,7 @@ const MoviePage = () => {
 
       {showNone && (
         <div
-          className={`fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-end justify-center ${
+          className={`fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-end justify-center lg:items-center ${
           isClosing
               ? 'animate-[fadeOut_0.25s_ease-out_forwards]'
               : 'animate-[fadeIn_0.2s_ease-out]'
@@ -324,7 +322,7 @@ const MoviePage = () => {
           onClick={closeSheet}
         >
           <div
-            className={`relative w-full max-w-4xl bg-tabbar rounded-t-3xl pb-17 ${
+            className={`relative w-full max-w-4xl lg:max-w-md bg-tabbar rounded-t-3xl lg:rounded-3xl pb-17 lg:pb-6 ${
             isClosing
                 ? 'animate-[slideDown_0.25s_ease-out_forwards]'
                 : 'animate-[slideUp_0.25s_ease-out]'
@@ -342,9 +340,9 @@ const MoviePage = () => {
             <div className='px-3 flex flex-col gap-1'>
 
               <button
-              onClick={(e) => handleWatched(e, movie)}
+              onClick={(e) => handlePlanned(e, movie)}
               className={`w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-colors cursor-pointer
-              ${isWatched(movie.id) && user
+              ${isPlanned(movie.id) && user
                 ? 'bg-primary/10 border border-primary/30 hover:bg-primary/15'
                 : 'bg-transparent border border-transparent hover:bg-white/5 active:bg-white/10'
               }`}>
@@ -362,9 +360,9 @@ const MoviePage = () => {
               </button>
 
               <button
-              onClick={(e) => handlePlanned(e, movie)}
+              onClick={(e) => handleWatched(e, movie)}
               className={`w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-colors cursor-pointer
-              ${isPlanned(movie.id) && user
+              ${isWatched(movie.id) && user
                 ? 'bg-primary/10 border border-primary/30 hover:bg-primary/15'
                 : 'bg-transparent border border-transparent hover:bg-white/5 active:bg-white/10'
               }`}>

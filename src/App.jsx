@@ -6,6 +6,8 @@ import Favorites from './pages/Favorites'
 import Profile from './pages/Profile'
 import Layout from './component/Layout'
 import Register from './pages/Register'
+import ResetPassword from './pages/ResetPassword'
+import VerifyEmail from './pages/VerifyEmail'
 
 const App = () => {
   return (
@@ -19,6 +21,8 @@ const App = () => {
       </Route>
 
       <Route path='/auth' element={<Register />} />
+      <Route path='/reset-password' element={<ResetPassword />} />
+      <Route path='/verify-email' element={<VerifyEmail />} />
     </Routes>
   )
 }

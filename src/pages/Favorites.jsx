@@ -34,7 +34,7 @@ const FavoriteCard = ({ movie, genre }) => {
 
   return (
     <Link to={`/movie/${movie.id}`}>
-      <div className='flex flex-col bg-tabbar rounded-xl overflow-hidden'>
+      <div className='flex flex-col bg-tabbar rounded-xl overflow-hidden transition-transform duration-200 lg:hover:scale-[1.03] lg:hover:shadow-card-hover'>
         <div
           className='relative aspect-[5/6] bg-primary bg-center bg-cover'
           style={{
@@ -83,8 +83,8 @@ const Favorites = () => {
         const genreRes = await fetch(`${API_BASE_TMDB}/genre/movie/list`, API_OPTION)
         const genreData = await genreRes.json()
         setGenre(genreData.genres)
-      } catch (error) {
-        console.log('failed fetching genres')
+      } catch {
+        setGenre([])
       }
     }
 
@@ -92,7 +92,7 @@ const Favorites = () => {
   }, [])
 
   return (
-    <div className='px-4 py-4 mb-14'>
+    <div className='px-4 py-4 mb-14 lg:mb-10 lg:max-w-6xl lg:mx-auto lg:px-6 lg:pt-8'>
       {favorites.length === 0 ? (
         <div className="flex flex-col items-center justify-center text-center min-h-[70vh] w-full px-6">
           <div
@@ -126,7 +126,7 @@ const Favorites = () => {
           <h1 className='text-3xl font-extrabold'>Favorites</h1>
           <p className='text-sm py-1 font-medium text-[#FFFFFF73]'>{favorites.length} movies</p>
 
-          <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mt-5'>
+          <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 lg:gap-4 mt-5'>
             {favorites.map((movie) => (
               <FavoriteCard key={movie.id} movie={movie} genre={genre} />
             ))}

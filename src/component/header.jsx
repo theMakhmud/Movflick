@@ -4,25 +4,15 @@ import { useAuth } from '../AuthContext'
 import { Link } from 'react-router-dom'
 
 const Header = () => {
-    const { user, authLoading } = useAuth()
+    const { user } = useAuth()
     return (
-        <header className='flex items-center py-4 px-4'>
+        <header className='flex items-center py-4 px-4 lg:hidden'>
             <nav className='flex w-full justify-between'>
                 <div className="flex gap-2">
                     <div className='w-7 h-7 rounded-lg bg-primary flex justify-center items-center'>
                         <img className='w-4 h-4' src={playIcon} alt="" />
                     </div>
                     <span className='text-white text-xl font-extrabold'>Mov<b className='text-primary lowercase'>Flick</b></span>
-                </div>
-
-                <ul className='hidden'>
-                    <li>Home</li>
-                    <li>Movies</li>
-                    <li>Favorites</li>
-                </ul>
-
-                <div className="search hidden">
-                    <input type="text" placeholder='Search movies...' />
                 </div>
 
                 {user ? (

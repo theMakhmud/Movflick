@@ -1,6 +1,5 @@
 import React from 'react'
 import star from '../assets/Movflick-selection.png'
-import playIcon from '../assets/Movflick-logo.png'
 import { Link, useNavigate } from 'react-router-dom'
 import { useFavorites } from '../FavContext'
 import { useAuth } from '../AuthContext'
@@ -9,7 +8,7 @@ const Trend = ({title,movieList, genreList}) => {
   const { toggleFav, isFavorites } = useFavorites()
 
     const navigate = useNavigate()
-    const { user, authLoading } = useAuth()
+    const { user } = useAuth()
 
     const handleFav = (e, movie) => {
         e.preventDefault()
@@ -21,20 +20,18 @@ const Trend = ({title,movieList, genreList}) => {
   return (
     <div className='flex flex-col gap-2'>
         <div className='flex justify-between items-center'>
-            <h2 className='text-lg'>{title}</h2>
-            {/* <a className='text-primary text-sm font-semibold' href="#">See all</a> */}
+            <h2 className='text-lg lg:text-2xl lg:font-bold'>{title}</h2>
         </div>
-        <div className='flex flex-1 gap-2  overflow-x-auto scrollbar-hide'>
+        <div className='flex flex-1 gap-2 lg:gap-4  overflow-x-auto scrollbar-hide'>
              {movieList?.map( (movie) => {
 
                 const genreName = genreList?.find(g => g.id === movie.genre_ids?.[0])?.name || movie.genres?.[0]?.name
                 const year = movie.release_date?.split('-')[0]
 
                 return (
-                    <Link to={`/movie/${movie.id}`}>
-                        <div 
-                        key={movie.id}
-                        className='flex flex-col bg-tabbar rounded-xl h-60 w-40 shrink-0 overflow-hidden'>
+                    <Link key={movie.id} to={`/movie/${movie.id}`}>
+                        <div
+                        className='flex flex-col bg-tabbar rounded-xl h-60 w-40 lg:h-80 lg:w-52 shrink-0 overflow-hidden transition-transform duration-200 lg:hover:scale-[1.03] lg:hover:shadow-card-hover'>
                             <div 
                             className='relative flex-1 bg-primary bg-center bg-cover'
                             style={{
@@ -49,7 +46,7 @@ const Trend = ({title,movieList, genreList}) => {
                                     </span>
                                     <button
                                         onClick={(e) => handleFav(e, movie)}
-                                        className='size-7 flex items-center justify-center rounded-full bg-base'>
+                                        className='relative size-7 flex items-center justify-center rounded-full bg-base after:absolute after:-inset-2.5 after:content-[""]'>
                                         <svg className={`size-4 ${isFavorites(movie.id) && user ? 'text-primary' : 'text-white'}`} fill={isFavorites(movie.id) && user ? 'currentColor' : 'none'} xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                             <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                                             <path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572" />

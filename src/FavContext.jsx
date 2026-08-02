@@ -45,44 +45,49 @@ export const FavoritesProvider = ({ children }) => {
   }, [user])
 
   const toggleInList = async (movie, listType) => {
+    if (!user) return false
 
     const existing = items.find(
       i => i.movieId === movie.id && i.listType === listType
     )
 
-    try {
-      if (existing) {
+    if (existing) {
+      setItems(prev => prev.filter(i => i.docId !== existing.docId))
+      try {
         await databases.deleteDocument(DB_ID, COLLECTION_ID, existing.docId)
-        setItems(prev => prev.filter(i => i.docId !== existing.docId))
-      } else {
-        const doc = await databases.createDocument(
-            DB_ID,
-            COLLECTION_ID,
-            ID.unique(),
-          {
-            userId: user.$id,
-            movieId: movie.id,
-            listType,
-            movieData: JSON.stringify(movie)
-          },
-          [
-            Permission.read(Role.user(user.$id)),
-            Permission.update(Role.user(user.$id)),
-            Permission.delete(Role.user(user.$id))
-          ]
-        )
-        setItems(prev => [...prev, {
-          docId: doc.$id,
-          movieId: movie.id,
-          listType,
-          movie
-        }])
+      } catch (err) {
+        console.error('Toggle failed:', err)
+        setItems(prev => [...prev, existing])
       }
       return true
+    }
+
+    const tempId = `temp-${movie.id}-${listType}`
+    setItems(prev => [...prev, { docId: tempId, movieId: movie.id, listType, movie }])
+
+    try {
+      const doc = await databases.createDocument(
+        DB_ID,
+        COLLECTION_ID,
+        ID.unique(),
+        {
+          userId: user.$id,
+          movieId: movie.id,
+          listType,
+          movieData: JSON.stringify(movie)
+        },
+        [
+          Permission.read(Role.user(user.$id)),
+          Permission.update(Role.user(user.$id)),
+          Permission.delete(Role.user(user.$id))
+        ]
+      )
+      setItems(prev => prev.map(i => (i.docId === tempId ? { ...i, docId: doc.$id } : i)))
     } catch (err) {
       console.error('Toggle failed:', err)
-      return true 
+      setItems(prev => prev.filter(i => i.docId !== tempId))
     }
+    return true
   }
 
 
