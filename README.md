@@ -76,7 +76,7 @@ npm install
 
 ```
 VITE_TMDB_API=ваш_ключ_TMDB
-VITE_APPWRITE_PROJECT_ID=id_проекта_appwrite
+VITE_APPWRITE_PROJECT_ID=id_проекта
 VITE_APPWRITE_ENDPOINT=https://fra.cloud.appwrite.io/v1
 VITE_APPWRITE_DB_ID=id_базы
 VITE_APPWRITE_COLLECTION_ID=id_коллекции
